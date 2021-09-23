@@ -25,7 +25,7 @@ class XposedClass : IXposedHookLoadPackage {
             // 00.01 -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.M .. Build.VERSION_CODES.P,
-                "com.android.keyguard.KeyguardUpdateMonitor",
+                KeyguardUpdateMonitor_clazz,
                 "isUnlockingWithFingerprintAllowed",
                 true
             )
@@ -33,14 +33,14 @@ class XposedClass : IXposedHookLoadPackage {
             // 00.01 - new -------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.Q .. Build.VERSION_CODES.Q,
-                "com.android.keyguard.KeyguardUpdateMonitor",
+                KeyguardUpdateMonitor_clazz,
                 "isUnlockingWithBiometricAllowed",
                 true
             )
 
             hook(
                 Build.VERSION_CODES.R .. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.keyguard.KeyguardUpdateMonitor",
+                KeyguardUpdateMonitor_clazz,
                 "isUnlockingWithBiometricAllowed",
                 true,
                 Boolean::class.javaPrimitiveType
@@ -49,7 +49,7 @@ class XposedClass : IXposedHookLoadPackage {
             // 00.02 -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.M .. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.keyguard.KeyguardUpdateMonitor",
+                KeyguardUpdateMonitor_clazz,
                 "isUnlockWithFingerprintPossible",
                 true,
                 Int::class.javaPrimitiveType
@@ -58,7 +58,7 @@ class XposedClass : IXposedHookLoadPackage {
             // 00.03 -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.M .. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.keyguard.KeyguardUpdateMonitor",
+                KeyguardUpdateMonitor_clazz,
                 "isFingerprintDisabled",
                 false,
                 Int::class.javaPrimitiveType
@@ -67,7 +67,7 @@ class XposedClass : IXposedHookLoadPackage {
             // 01.00 -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.M .. Build.VERSION_CODES.P,
-                "com.android.keyguard.KeyguardUpdateMonitor\$StrongAuthTracker",
+                KeyguardUpdateMonitor_StrongAuthTracker_clazz,
                 "isUnlockingWithFingerprintAllowed",
                 true
             )
@@ -75,14 +75,14 @@ class XposedClass : IXposedHookLoadPackage {
             // 01.00 - new -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.Q .. Build.VERSION_CODES.Q,
-                "com.android.keyguard.KeyguardUpdateMonitor\$StrongAuthTracker",
+                KeyguardUpdateMonitor_StrongAuthTracker_clazz,
                 "isUnlockingWithBiometricAllowed",
                 true
             )
 
             hook(
                 Build.VERSION_CODES.R .. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.keyguard.KeyguardUpdateMonitor\$StrongAuthTracker",
+                KeyguardUpdateMonitor_StrongAuthTracker_clazz,
                 "isUnlockingWithBiometricAllowed",
                 true,
                 Boolean::class.javaPrimitiveType
@@ -90,8 +90,8 @@ class XposedClass : IXposedHookLoadPackage {
 
             // 02.00 -------------------------------------------------------------------------------
             hook(
-                Build.VERSION_CODES.M .. Build.VERSION_CODES.P,
-                "com.android.internal.widget.LockPatternUtils\$StrongAuthTracker",
+                Build.VERSION_CODES.N .. Build.VERSION_CODES.P,
+                LockPatternUtils_StrongAuthTracker_clazz,
                 "isFingerprintAllowedForUser",
                 true,
                 Int::class.javaPrimitiveType
@@ -100,7 +100,7 @@ class XposedClass : IXposedHookLoadPackage {
             // 02.00 - new -------------------------------------------------------------------------------
             hook(
                 Build.VERSION_CODES.Q .. Build.VERSION_CODES.Q,
-                "com.android.internal.widget.LockPatternUtils\$StrongAuthTracker",
+                LockPatternUtils_StrongAuthTracker_clazz,
                 "isBiometricAllowedForUser",
                 true,
                 Int::class.javaPrimitiveType
@@ -108,12 +108,18 @@ class XposedClass : IXposedHookLoadPackage {
 
             hook(
                 Build.VERSION_CODES.R.. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.internal.widget.LockPatternUtils\$StrongAuthTracker",
+                LockPatternUtils_StrongAuthTracker_clazz,
                 "isBiometricAllowedForUser",
                 true,
                 Boolean::class.javaPrimitiveType,
                 Int::class.javaPrimitiveType
             )
         }
+    }
+
+    companion object {
+        const val KeyguardUpdateMonitor_clazz = "com.android.keyguard.KeyguardUpdateMonitor"
+        const val KeyguardUpdateMonitor_StrongAuthTracker_clazz = "com.android.keyguard.KeyguardUpdateMonitor\$StrongAuthTracker"
+        const val LockPatternUtils_StrongAuthTracker_clazz = "com.android.internal.widget.LockPatternUtils\$StrongAuthTracker"
     }
 }
