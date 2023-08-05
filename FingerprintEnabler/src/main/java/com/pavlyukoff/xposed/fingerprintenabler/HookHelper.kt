@@ -2,18 +2,18 @@ package com.pavlyukoff.xposed.fingerprintenabler
 
 import android.os.Build
 import android.util.Log
-import de.robv.android.xposed.XC_MethodReplacement
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.XposedHelpers
 
-class HookHelper(private val classLoader: ClassLoader) {
-    private val isDebug = BuildConfig.DEBUG
+class HookHelper(
+    private val classLoader: ClassLoader,
+    private val module: XposedClass
+) {
+    private val isDebug = true
 
 
     private fun LogE(
         e: Throwable
     ) {
-        XposedBridge.log("[$TAG] ${Log.getStackTraceString(e)}")
+        module.log("[$TAG] ${Log.getStackTraceString(e)}")
 
         if (!isDebug) return
 
@@ -25,8 +25,17 @@ class HookHelper(private val classLoader: ClassLoader) {
         className: String,
         methodName: String
     ) {
-        val logText = "[$TAG] Hook : ${if (hooked) "YES" else "no"} : $methodName : $className"
-        XposedBridge.log(logText)
+        val logText = StringBuilder().apply {
+            append("[${TAG}] ")
+            append("Hook : ")
+            if (hooked) {
+                append("YES")
+            } else {
+                append("NO")
+            }
+            append(" : $methodName : $className")
+        }.toString()
+        module.log(logText)
 
         if (!isDebug) return
 
@@ -39,70 +48,22 @@ class HookHelper(private val classLoader: ClassLoader) {
         className: String,
         methodName: String,
         result: Boolean,
-        parameterTypes: Any?
+        vararg parameters: Class<out Any?>? = emptyArray()
     ) {
-        hook(apiRange, className, methodName) {
-            XposedHelpers.findAndHookMethod(
-                className,
-                classLoader,
-                methodName,
-                parameterTypes, XC_MethodReplacement.returnConstant(result)
-            )
-        }
-    }
 
-    @Throws(Throwable::class)
-    fun hook(
-        apiRange: IntRange,
-        className: String,
-        methodName: String,
-        result: Boolean,
-        parameterTypes: Any?,
-        parameterTypes2: Any?
-    ) {
-        hook(apiRange, className, methodName) {
-            XposedHelpers.findAndHookMethod(
-                className,
-                classLoader,
-                methodName,
-                parameterTypes, parameterTypes2, XC_MethodReplacement.returnConstant(result)
-            )
-        }
-    }
-
-    @Throws(Throwable::class)
-    fun hook(
-        apiRange: IntRange,
-        className: String,
-        methodName: String,
-        result: Boolean
-    ) {
-        hook(apiRange, className, methodName) {
-            XposedHelpers.findAndHookMethod(
-                className,
-                classLoader,
-                methodName,
-                XC_MethodReplacement.returnConstant(result)
-            )
-        }
-    }
-
-    @Throws(Throwable::class)
-    private fun hook(
-        apiRange: IntRange,
-        className: String,
-        methodName: String,
-        hookProcess: () -> Unit
-    ) {
         if (Build.VERSION.SDK_INT !in apiRange) return
 
         var hooked = true
         try {
-            hookProcess()
+            module.hook(
+                classLoader.loadClass(className).getDeclaredMethod(methodName, *parameters),
+                ReturnConstReplace(result).javaClass
+            )
         } catch (e: Throwable) {
             hooked = false
             LogE(e)
         }
+
         LogE(hooked, className, methodName)
     }
 

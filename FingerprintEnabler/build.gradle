@@ -41,6 +41,7 @@ android {
 
 dependencies {
     testImplementation libs.junit
+    compileOnly files('libs/api-100.aar')
     compileOnly libs.libxposed.api
     implementation libs.libxposed.service
 }

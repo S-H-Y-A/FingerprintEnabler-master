@@ -1,26 +1,48 @@
 package com.pavlyukoff.xposed.fingerprintenabler
 
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.os.Build
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import io.github.libxposed.api.XposedContext
+import io.github.libxposed.api.XposedInterface
+import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.PackageLoadedParam
+import io.github.libxposed.api.annotations.AfterInvocation
+import io.github.libxposed.api.annotations.BeforeInvocation
+import io.github.libxposed.api.annotations.XposedHooker
+import java.lang.reflect.Member
+import kotlin.random.Random
 
-class XposedClass : IXposedHookLoadPackage {
+private lateinit var module: XposedClass
 
-    @Throws(Throwable::class)
-    override fun handleLoadPackage(lpparam: LoadPackageParam) {
-        if (lpparam.packageName != "com.android.systemui") return
+class XposedClass(base: XposedContext, param: ModuleLoadedParam) : XposedModule(base, param) {
 
-        HookHelper(lpparam.classLoader).apply {
+    init {
+        log("ModuleMain at " + param.processName)
+        module = this
+    }
+
+    @SuppressLint("DiscouragedPrivateApi")
+    override fun onPackageLoaded(param: PackageLoadedParam) {
+
+        if (param.packageName != "com.android.systemui") return
+        if (!param.isFirstPackage) return
+
+
+
+        HookHelper(param.classLoader, module).apply {
 
             // 00.00 -------------------------------------------------------------------------------
             //this MUST disable request PIN at all - DANGEROUS
-/*            hook(
-                Build.VERSION_CODES.M .. Build.VERSION_CODES.CUR_DEVELOPMENT,
-                "com.android.keyguard.KeyguardUpdateMonitor",
-                "getUserCanSkipBouncer",
-                true,
-                Int::class.javaPrimitiveType
-            )*/
+            /*            hook(
+                            Build.VERSION_CODES.M .. Build.VERSION_CODES.CUR_DEVELOPMENT,
+                            "com.android.keyguard.KeyguardUpdateMonitor",
+                            "getUserCanSkipBouncer",
+                            true,
+                            Int::class.javaPrimitiveType
+                        )*/
 
             // 00.01 -------------------------------------------------------------------------------
             hook(
